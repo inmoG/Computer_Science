@@ -8,22 +8,20 @@
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 
-
-def rsa_encrypt(msg):
-    private_key = RSA.generate(1024)  # 개인키 생성
-    public_key = private_key.publickey()  # 공개키 생성
+def rsa_enc(msg):
+    private_key = RSA.generate(1024) # 개인키 생성
+    public_key = private_key.publickey() # 개인키 생성
     cipher = PKCS1_OAEP.new(public_key)
-    encdata = cipher.encrypt(msg)  # 암호화
-    print(f"암호화 결과 : {encdata}")
+    encdata = cipher.encrypt(msg) # encrypt
+    print(encdata)
 
-    cipher = PKCS1_OAEP.new(private_key)
-    decdata = cipher.decrypt(encdata)  # 복호화
-    print(f"복호화 결과 : {decdata}")
-
+    cipher = PKCS1_OAEP.new(private_key) # PKCS1 객체 생성
+    decdata = cipher.decrypt(encdata) # 복호화
+    print(decdata)
 
 def main():
-    msg = "RSA 공개키 암호 구현하기 예제"
-    rsa_encrypt(msg.encode("utf-8"))
-
+    msg = 'samjang loves python'
+    rsa_enc(msg.encode('utf-8'))
 
 main()
+
