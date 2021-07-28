@@ -7,7 +7,7 @@ def save_to_file(course):
     writer = csv.writer(file)
     writer.writerow(['title', 'course_link', 'instructor',
                      'rating', 'price', 'description', 'level', 'skills'])
-
+ 
     for course in course:
         writer.writerow(list(course.values()))  # list(course.values)
 
