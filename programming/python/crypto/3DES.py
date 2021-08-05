@@ -1,6 +1,6 @@
 from Crypto.Cipher import DES3
 from Crypto.Hash import SHA256 as SHA
-from os import path # getsize 이용
+from os import path # getsize 이용하고자 import 함
 KSIZE = 1024 # 전역변수
 
 class myDES():
