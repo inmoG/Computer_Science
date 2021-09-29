@@ -1,4 +1,4 @@
-class Robot:
+ class Robot:
     # class 변수 : 인스턴스들이 공유하는 변수
     population = 0
 

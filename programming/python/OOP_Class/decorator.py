@@ -1,9 +1,12 @@
+# decorator
+
+
 def copyright(func):
     def new_func():
-        print("@ adasdadadsad")
-        func()
+        print("@ amamovsdfjkldjsakfljdskaljfkdsla")  # 2. 출력
+        func()  # 3. func() > smile() 실행
 
-    return new_func
+    return new_func  # 1 new_func 실행
 
 
 @copyright
