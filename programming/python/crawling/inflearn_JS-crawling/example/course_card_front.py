@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 
 URL = f"https://www.inflearn.com/courses/it-programming?order=seq&skill=javascript"
 
-def get_last_page():
+def get_last_page(): # 페이지 추출하기
 
     request = requests.get(URL)
     soup = BeautifulSoup(request.text, 'html.parser')
@@ -16,7 +16,7 @@ def get_last_page():
     
     return page[-1]
 
-def extract_course(page):
+def extract_course(page): # 코스 추출하기
     course = []
     for page in range(page):
         page + 1
@@ -30,7 +30,7 @@ def extract_course(page):
 
     return course
 
-def extract_course_content(html):
+def extract_course_content(html): # 코스 정보 가져오기
     link = html.find("a", {"class": "course_card_front"})["href"]
     title = html.find("div", {"class": "course_title"}).text
     instructor = html.find("div", {"class": "instructor"}).text
