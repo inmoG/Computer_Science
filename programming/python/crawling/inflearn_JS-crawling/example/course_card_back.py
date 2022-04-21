@@ -46,5 +46,3 @@ def get_course():
     page = get_last_page()
     course = extract_course(page)
     return course
-
-print(get_course())
