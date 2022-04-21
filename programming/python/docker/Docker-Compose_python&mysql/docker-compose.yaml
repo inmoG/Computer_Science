@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  db:
+    # mysql의 최근 이미지를 사용
+    image: mysql
+    restart: always
+    # 데이터베이스 환경설정
+    environment:
+      - MYSQL_ROOT_PASSWORD=t123456789
+      - MYSQL_PASSWORD=t123456789
+      - MYSQL_DATABASE=memlist
+    ports:
+      - "3306:3306"
+    volumes:
+      - C:\mysql\team-5\mysql:/var/lib/mysql/
+
+  python:
+    # Dockerfile을 통해 이미지화한 이미지를 사용
+    image: sql_python
+    restart: always
+    # python실행을 지연시키기 위한 명령
+    command:
+      [
+        "/wait-for-it.sh",
+        "tcp://db:3306",
+        "-t",
+        "20",
+        "--",
+        "python",
+        "main.py",
+      ]
+    # 서비스간의 종속성 순서대로 서비스를 시작
+    depends_on:
+      - db
