@@ -17,7 +17,7 @@ services:
 
   python:
     # Dockerfile을 통해 이미지화한 이미지를 사용
-    image: sql_python
+    image: study
     restart: always
     # python실행을 지연시키기 위한 명령
     command:
@@ -33,3 +33,9 @@ services:
     # 서비스간의 종속성 순서대로 서비스를 시작
     depends_on:
       - db
+
+# 사용법       
+#1. docker desktop update
+#2. dockerfile build >> docker build -t [image name] .
+#3. docker compose >> docker compose run python
+

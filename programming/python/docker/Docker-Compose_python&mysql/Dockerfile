@@ -10,5 +10,5 @@ ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.s
 RUN chmod +x /wait-for-it.sh
 # 위에서 지연시키는 파일을 실행권한을 부여하고 실행하기 위함 => 실행은 docker-compose.yaml파일에 정의된 명령을 실행
 
-# 빌드 docker build -t sql_python .
+# 빌드 docker build -t [image name] .
 # 컨테이너에서 파이썬파일 실행(docker-compose) docker compose run python
