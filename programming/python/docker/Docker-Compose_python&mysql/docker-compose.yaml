@@ -13,7 +13,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - C:\mysql\team-5\mysql:/var/lib/mysql/
+      - C:\mysql\docker\mysql:/var/lib/mysql/
 
   python:
     # Dockerfile을 통해 이미지화한 이미지를 사용
