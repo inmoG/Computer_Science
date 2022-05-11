@@ -1,12 +1,40 @@
 import os
 
+# from tkinter import N
+
+# 5 + 5 * 10
+
+# 계산식을 입력받는다.
+# 입력받은 식의 숫자와 연산자를 구분한다.
+# 만약에 숫자면 숫자를 담는 리스트에 저장한다.
+# 만약에 공백이면 버린다.
+# 만약에 연산자면 연산자를 담는 리스트에 저장한다.
+# n번째 숫자와 n번째 연산자를 가져와 연산한다.
+
+
+operator = ["+", "-", "*", "/", "="]
+user_input = "5 + 5 * 10"
+
+string_list = []
+
+for string in user_input:
+    try:
+        if type(int(string)) == int:
+            string_list.append(string)
+    except ValueError:
+        if string in operator:
+            string_list.append(string)
+
+lop = 1  # last operator position
+
+
+"""
+import os
+
 operator = ["+", "-", "*", "/", "="]
 
-'''
-operator user_input string_list 
-1. 빈 리스트를 생성한다.
-2. 
-'''
+# operator user_input string_list 
+# 1. 빈 리스트를 생성한다.
 
 
 def string_calculator(user_input, show_history=False):
@@ -54,3 +82,5 @@ user_input = input("계산식을 입력하세요 > ")
     #    break
 result = string_calculator(user_input, show_history=True) # [60-30]
 print(f"결과 {result}")
+
+"""
